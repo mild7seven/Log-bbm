@@ -679,3 +679,28 @@ async function init() {
 }
 
 init();
+
+
+function detectDevice(){
+ document.body.classList.remove('mobile','tablet','desktop');
+ const w=window.innerWidth;
+ if(w<600) document.body.classList.add('mobile');
+ else if(w<1024) document.body.classList.add('tablet');
+ else document.body.classList.add('desktop');
+}
+function updateViewportHeight(){
+ document.documentElement.style.setProperty('--vh',`${window.innerHeight*0.01}px`);
+}
+window.addEventListener('resize',()=>{
+ detectDevice();
+ updateViewportHeight();
+ const c=document.getElementById('fuelChart');
+ if(c && c.parentElement){
+   c.width=Math.max(c.parentElement.clientWidth,320);
+   c.height=window.innerWidth<600?220:(window.innerWidth<1024?280:420);
+ }
+ if(typeof renderChart==='function') renderChart();
+ if(typeof calculateMID==='function') calculateMID();
+});
+detectDevice();
+updateViewportHeight();
