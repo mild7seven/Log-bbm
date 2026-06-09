@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#07111f" />
+  <title>BBM MID Toyota PWA</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="eyebrow">PWA Log Konsumsi BBM</div>
+      <h1>BBM MID Toyota</h1>
+      <p class="sub">Offline first, dashboard ala MID mobil, grafik konsumsi, backup data, dan kirim ke Telegram langsung dari browser.</p>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost" id="installBtn" type="button">Install</button>
+      <button class="btn btn-ghost" id="themeBtn" type="button">Mode</button>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="mid-panel card">
+      <div class="card-head">
+        <h2>MID Dashboard</h2>
+        <div class="badge" id="connectionBadge">Offline ready</div>
+      </div>
+
+      <div class="mid-screen" id="midScreen">
+        <div class="mid-row mid-row-top">
+          <div class="fuel-block">
+            <div class="label">FUEL</div>
+            <div class="fuel-ring">
+              <div class="fuel-ring-inner">
+                <div class="fuel-percent" id="fuelLevel">100%</div>
+                <div class="fuel-sub" id="fuelLabel">Tank</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="range-block">
+            <div class="label">RANGE</div>
+            <div class="big-number" id="remainingRange">0 km</div>
+            <div class="hint" id="rangeHint">Estimasi jarak tersisa</div>
+          </div>
+        </div>
+
+        <div class="mid-row mid-row-middle">
+          <div class="stat-card">
+            <div class="label">AVG FUEL</div>
+            <div class="stat-value" id="avgKml">0.00 km/L</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">COST / KM</div>
+            <div class="stat-value" id="costPerKm">Rp0</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">TRIP A</div>
+            <div class="stat-value" id="tripA">0 km</div>
+            <div class="stat-mini" id="tripALabel">reset manual</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">TRIP B</div>
+            <div class="stat-value" id="tripB">0 km</div>
+            <div class="stat-mini" id="tripBLabel">reset manual</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">ODO</div>
+            <div class="stat-value" id="odoValue">0 km</div>
+            <div class="stat-mini" id="odoLabel">odometer terakhir</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">SERVICE DUE</div>
+            <div class="stat-value" id="serviceDue">0 km</div>
+            <div class="stat-mini" id="serviceLabel">interval servis</div>
+          </div>
+        </div>
+
+        <div class="mid-row mid-row-bottom">
+          <div class="mid-line">
+            <span>Status</span>
+            <strong id="midStatus">Siap digunakan</strong>
+          </div>
+          <div class="mid-line">
+            <span>Last Update</span>
+            <strong id="lastUpdate">-</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card grid-2">
+      <div>
+        <div class="card-head">
+          <h2>Input Log BBM</h2>
+          <div class="badge badge-soft" id="saveState">Belum disimpan</div>
+        </div>
+
+        <div class="form-grid form-grid-2">
+          <label>
+            <span>Nama Kendaraan</span>
+            <input id="vehicle" type="text" placeholder="Avanza / Motor / Truck" />
+          </label>
+          <label>
+            <span>Tanggal</span>
+            <input id="date" type="date" />
+          </label>
+        </div>
+
+        <div class="form-grid form-grid-2">
+          <label>
+            <span>Odometer (km)</span>
+            <input id="odometer" type="number" min="0" step="0.1" placeholder="12345.6" />
+          </label>
+          <label>
+            <span>Liter BBM</span>
+            <input id="liters" type="number" min="0" step="0.01" placeholder="20" />
+          </label>
+        </div>
+
+        <div class="form-grid form-grid-2">
+          <label>
+            <span>Total Biaya (Rp)</span>
+            <input id="cost" type="number" min="0" step="1" placeholder="300000" />
+          </label>
+          <label>
+            <span>Harga/Liter (opsional)</span>
+            <input id="pricePerLiter" type="number" min="0" step="1" placeholder="13500" />
+          </label>
+        </div>
+
+        <div class="form-grid form-grid-2">
+          <label>
+            <span>Kapasitas Tangki (L)</span>
+            <input id="tankCapacity" type="number" min="0" step="0.1" placeholder="45" />
+          </label>
+          <label>
+            <span>Isi Tangki Saat Ini (%)</span>
+            <input id="fuelPercent" type="number" min="0" max="100" step="1" value="100" />
+          </label>
+        </div>
+
+        <label>
+          <span>Catatan</span>
+          <textarea id="notes" placeholder="Contoh: isi penuh di SPBU..."></textarea>
+        </label>
+
+        <div class="btn-grid">
+          <button class="btn btn-primary" id="saveBtn" type="button">Simpan Log</button>
+          <button class="btn btn-ghost" id="clearBtn" type="button">Bersihkan Form</button>
+          <button class="btn btn-success" id="sendBtn" type="button">Kirim Telegram</button>
+          <button class="btn btn-ghost" id="exportBtn" type="button">Export JSON</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="card-head">
+          <h2>Pengaturan MID & Telegram</h2>
+          <div class="badge badge-soft">Frontend only</div>
+        </div>
+
+        <div class="form-grid form-grid-2">
+          <label>
+            <span>Bot Token</span>
+            <input id="botToken" type="password" placeholder="123456:ABCDEF..." />
+          </label>
+          <label>
+            <span>Chat ID</span>
+            <input id="chatId" type="text" placeholder="123456789" />
+          </label>
+        </div>
+
+        <div class="form-grid form-grid-2">
+          <label>
+            <span>Interval Servis (km)</span>
+            <input id="serviceInterval" type="number" min="1000" step="500" value="10000" />
+          </label>
+          <label>
+            <span>Last Service ODO</span>
+            <input id="lastServiceOdo" type="number" min="0" step="0.1" placeholder="50000" />
+          </label>
+        </div>
+
+        <div class="form-grid form-grid-2">
+          <label>
+            <span>Trip A Start ODO</span>
+            <input id="tripAStart" type="number" min="0" step="0.1" placeholder="reset otomatis" />
+          </label>
+          <label>
+            <span>Trip B Start ODO</span>
+            <input id="tripBStart" type="number" min="0" step="0.1" placeholder="reset otomatis" />
+          </label>
+        </div>
+
+        <div class="btn-grid">
+          <button class="btn btn-ghost" id="tripAResetBtn" type="button">Reset Trip A</button>
+          <button class="btn btn-ghost" id="tripBResetBtn" type="button">Reset Trip B</button>
+          <button class="btn btn-ghost" id="serviceResetBtn" type="button">Mark Service Done</button>
+          <button class="btn btn-danger" id="resetAllBtn" type="button">Hapus Semua Data</button>
+        </div>
+
+        <div class="info-stack">
+          <div class="info-row">
+            <span>Telegram Endpoint</span>
+            <strong>https://api.telegram.org/botTOKEN/sendMessage</strong>
+          </div>
+          <div class="info-row">
+            <span>Backup</span>
+            <strong>JSON export / import lokal</strong>
+          </div>
+          <div class="info-row">
+            <span>Mode Offline</span>
+            <strong>PWA + IndexedDB</strong>
+          </div>
+        </div>
+
+        <label class="import-box">
+          <span>Import JSON Backup</span>
+          <input id="importFile" type="file" accept="application/json" />
+        </label>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>Grafik Konsumsi BBM</h2>
+        <div class="badge badge-soft">KM/L per pengisian</div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="fuelChart" width="1200" height="420"></canvas>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>Riwayat Log</h2>
+        <div class="badge badge-soft" id="historyCount">0 entri</div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th>Kendaraan</th>
+              <th>Odo</th>
+              <th>Jarak</th>
+              <th>Liter</th>
+              <th>KM/L</th>
+              <th>Biaya</th>
+              <th>Catatan</th>
+            </tr>
+          </thead>
+          <tbody id="history"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <template id="emptyRowTemplate">
+    <tr><td colspan="8" class="empty">Belum ada data log.</td></tr>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
